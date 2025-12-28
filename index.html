@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>4 piks one word</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #ffb7b7;
+            --dark-gray: #787c7e;
+            --light-gray: #d3d6da;
+            --slot-border: #bbbec1;
+        }
+
+        body {
+            background-image: url('https://i.imgur.com/K8d8qqH.png'); /* Cat Pattern */
+            background-repeat: repeat;
+            background-size: 200px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            max-height: 95vh; /* Keep within viewport */
+        }
+
+        .level-indicator {
+            font-weight: bold;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        h2 { color: #555; margin: 0 0 15px 0; font-size: 1.4rem; }
+
+        /* Responsive 4 Pics Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 8px;
+            margin-bottom: 15px;
+        }
+        .image-grid img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .answer-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+        .slot {
+            width: 35px;
+            height: 40px;
+            border-bottom: 3px solid var(--slot-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        /* Keyboard - Optimized for Mobile */
+        .keyboard { display: flex; flex-direction: column; gap: 6px; }
+        .keyboard-row { display: flex; gap: 4px; justify-content: center; width: 100%; }
+        .key {
+            height: 45px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex: 1;
+            user-select: none;
+        }
+        .key.large { flex: 1.5; font-size: 0.75rem; }
+        .key:active { background: #bbb; }
+
+        #letter-wrapper {
+            display: none;
+            flex-direction: column;
+            text-align: left;
+            animation: fadeIn 1.2s ease-in-out;
+            max-height: 100%;
+        }
+
+        .scrollable-letter {
+            overflow-y: auto;
+            max-height: 400px; /* Limits height and enables scroll */
+            padding-right: 10px;
+            margin-top: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        /* Custom Scrollbar for Chrome/Safari */
+        .scrollable-letter::-webkit-scrollbar { width: 6px; }
+        .scrollable-letter::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 400px) {
+            .slot { width: 30px; font-size: 1.2rem; }
+            .key { height: 40px; font-size: 0.8rem; }
+            h2 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="game-content">
+        <div class="level-indicator" id="level-text">Level 1 of 3</div>
+        <h2>What's the word? 🐾</h2>
+        
+        <div class="image-grid" id="image-grid"></div>
+        <div class="answer-container" id="answer-slots"></div>
+
+        <div class="keyboard">
+            <div class="keyboard-row" id="row-1"></div>
+            <div class="keyboard-row" id="row-2"></div>
+            <div class="keyboard-row" id="row-3"></div>
+        </div>
+    </div>
+
+    <div id="letter-wrapper">
+        <h2 style="color: #ff9494; margin-bottom: 5px;">Happy Anniversary Bab!! ❤️😚</h2>
+        <div class="scrollable-letter">
+            <p>Sorry sa random game bab ahihihihi, I supposedly na isesend ko sayo 'to sa messenger pero naisipan ko na gawin siyang game and ilagay yung message ko sa dulo. I hope nagustuhan mo hihi 😁</p>
+            
+            <p>Before that bab, I just want to say thank you sa gift mo sa akin, sobrang nagustuhan ko siya and saktong sakto siya sa'kin, nako alam na alam mo na sukat ko ahihihi. Sorry din bab wala akong mairegalo sayo sa ngayon, plano ko sana dati but di ko alam na yun pala talaga yung address mo. 😭</p>
+            
+            <p>So ayun nga, happy anniversary bab! It's been a year since naging tayo hihihi. It may look like super bilis yet maraming nangyari sa loob ng isang taon. May masayang moments, may malungkot. Especially recently. I'm sorry bab for actions I've done that hurted you. But you know, I'm also thankful because we were able to still be together and I want to 🙂</p>
+            
+            <p>And here we are, we are celebrating our first anniv! Ahihihihi 🥰🥰. I'm looking forward to our journey together, and sana magkita na tayo soon, I really wanna see you and we go on lots of dates — movie dates, food dates, any kind of dates!</p>
+            
+            <p>I wish best of luck for us together, I love youuu babbb, happy anniversary to us 😚😚😚😚😚</p>
+            
+            <p>Forever yours,<br>Daniel (beb)</p>
+            <div style="height: 20px;"></div> </div>
+    </div>
+</div>
+
+<script>
+    const levels = [
+        {
+            word: "TUTU",
+            images: [
+                "images/tutu.jpeg",
+                "images/tutu.jpeg",
+                "images/tutu.jpeg",
+                "images/tutu.jpeg",
+            ]
+        },
+        {
+            word: "SIOPAO",
+            images: [
+                "images/siopao1.jpg",
+                "images/siopao2.jpg",
+                "images/siopao3.jpg",
+                "images/siopao4.jpg"
+            ]
+        },
+        {
+            word: "BABY",
+            images: [
+                "images/baby1.jpg",
+                "images/baby2.jpg",
+                "images/tutu.jpeg",
+                "images/baby4.jpg"
+            ]
+        }
+    ];
+
+    let currentLevelIdx = 0;
+    let currentGuess = "";
+    let gameOver = false;
+
+    function loadLevel(idx) {
+        currentGuess = "";
+        const level = levels[idx];
+        document.getElementById('level-text').innerText = `Level ${idx + 1} of ${levels.length}`;
+
+        const grid = document.getElementById('image-grid');
+        grid.innerHTML = '';
+        level.images.forEach(src => {
+            const img = document.createElement('img');
+            img.src = src;
+            grid.appendChild(img);
+        });
+
+        const slots = document.getElementById('answer-slots');
+        slots.innerHTML = '';
+        for (let i = 0; i < level.word.length; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'slot';
+            slot.id = `slot-${i}`;
+            slots.appendChild(slot);
+        }
+    }
+
+    const rows = [
+        ['Q','W','E','R','T','Y','U','I','O','P'],
+        ['A','S','D','F','G','H','J','K','L'],
+        ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫']
+    ];
+
+    rows.forEach((row, idx) => {
+        const rowContainer = document.getElementById(`row-${idx + 1}`);
+        row.forEach(key => {
+            const keyBtn = document.createElement('div');
+            keyBtn.className = 'key' + (key.length > 1 ? ' large' : '');
+            keyBtn.innerText = key;
+            keyBtn.onclick = () => handleInput(key);
+            rowContainer.appendChild(keyBtn);
+        });
+    });
+
+    function handleInput(key) {
+        if (gameOver) return;
+        const targetWord = levels[currentLevelIdx].word;
+
+        if (key === "ENTER") {
+            if (currentGuess === targetWord) {
+                if (currentLevelIdx < levels.length - 1) {
+                    confetti({ particleCount: 60, spread: 50, origin: { y: 0.8 } });
+                    currentLevelIdx++;
+                    loadLevel(currentLevelIdx);
+                } else {
+                    win();
+                }
+            } else {
+                alert("Incorrect! Hint: It's " + targetWord.length + " letters long.");
+                currentGuess = "";
+                updateSlots();
+            }
+        } else if (key === "⌫") {
+            currentGuess = currentGuess.slice(0, -1);
+            updateSlots();
+        } else if (currentGuess.length < targetWord.length && key.length === 1) {
+            currentGuess += key;
+            updateSlots();
+        }
+    }
+
+    function updateSlots() {
+        const targetWord = levels[currentLevelIdx].word;
+        for (let i = 0; i < targetWord.length; i++) {
+            const slot = document.getElementById(`slot-${i}`);
+            slot.innerText = currentGuess[i] || "";
+        }
+    }
+
+    function win() {
+        gameOver = true;
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        setTimeout(() => {
+            document.getElementById('game-content').style.display = 'none';
+            document.getElementById('letter-wrapper').style.display = 'flex';
+        }, 1000);
+    }
+
+    loadLevel(0);
+</script>
+
+</body>
+</html>
